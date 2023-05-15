@@ -1,0 +1,51 @@
+import processing.serial.*;  // Importam biblioteca seriala pentru comunicare
+PFont font;                 // Variabila pentru a stoca un font
+Serial port;                // Obiect pentru portul serial de comunicare
+
+char letter;                // Variabila pentru a stoca un caracter
+String words = "";          // Variabila pentru a stoca un sir de caractere
+
+int Sensor;                 // Variabila pentru a stoca valoarea senzorului
+int IBI;                    // Variabila pentru a stoca valoarea IBI
+int BPM;                    // Variabila pentru a stoca valoarea BPM
+int[] RawY;                 // Tablou pentru a stoca valorile brute Y
+int[] ScaledY;              // Tablou pentru a stoca valorile scalate Y
+int[] rate;                 // Tablou pentru a stoca rate
+float offset;               // Valoarea de compensare
+color eggshell = color(255, 254, 250);  // Variabila de culoare pentru fundal
+int PulseWindowWidth;       // Latimea ferestrei de puls
+int PulseWindowHeight;      // inaltimea ferestrei de puls
+int zoom_val=70;            // Valoarea de zoom
+long beat_rec_time;         // Timpul inregistrarii pulsului
+
+void setup() {
+  size(500, 400);  // Seteaza dimensiunile scenei
+  PulseWindowWidth = width - 20;  // Calculeaza latimea ferestrei de puls
+  PulseWindowHeight = height - 70;  // Calculeaza inaltimea ferestrei de puls
+  frameRate(100);  // Seteaza rata de cadre
+  textAlign(CENTER);  // Seteaza alinierea textului la centru
+  rectMode(CENTER);  // Seteaza modul de desenare al dreptunghiului la centru
+  ellipseMode(CENTER);  // Seteaza modul de desenare al elipsei la centru
+
+  RawY = new int[PulseWindowWidth];  // Initializeaza tabloul RawY
+  ScaledY = new int[PulseWindowWidth];  // Initializeaza tabloul ScaledY
+
+  for (int i=0; i<RawY.length; i++) {
+    RawY[i] = height/2;  
+    // Seteaza valorile initiale pentru tabloul RawY
+  }
+
+  println(Serial.list());  // Afiseaza porturile seriale disponibile
+  port = new Serial(this, "/dev/ttyS0", 9600);  // Initializeaza portul serial
+  port.clear();  // Goleste bufferul serial
+  port.bufferUntil('\n');  // Seteaza bufferul pentru a citi pana la caracterul newline
+}
+
+void draw() {
+  background(0);  // Seteaza culoarea de fundal la negru
+  noStroke();  // Dezactiveaza conturul
+
+  fill(eggshell);  // Seteaza culoarea de umplere la eggshell
+  rect(250, height/2, PulseWindowWidth, PulseWindowHeight);  
+}
+  // Deseneaza un dreptunghi pentru fereastra de puls
